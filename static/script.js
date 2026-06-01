@@ -181,9 +181,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 marksHtml = `<div class="card-error">${error}</div>`;
             } else if (marks && marks.length > 0) {
+                let validMarks = 0;
                 marks.forEach(m => {
-                    totalObtained += parseFloat(m.OrginalConvertedMark) || 0;
+                    const val = parseFloat(m.OrginalConvertedMark);
+                    if (!isNaN(val)) {
+                        totalObtained += val;
+                        validMarks++;
+                    }
                 });
+                if (validMarks > 0) {
+                    totalObtained = totalObtained / validMarks;
+                }
                 totalObtained = Math.round(totalObtained * 100) / 100;
 
                 const list = marks.map(m => {
