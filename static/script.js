@@ -180,7 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error) {
                 marksHtml = `<div class="card-error">${error}</div>`;
             } else if (marks && marks.length > 0) {
+                let totalScore = 0;
+                let totalMax = 0;
+                
                 const list = marks.map(m => {
+                    const score = parseFloat(m.OrginalConvertedMark) || 0;
+                    const max = parseFloat(m.RubricsMaxMark) || 0;
+                    totalScore += score;
+                    totalMax += max;
+                    
                     const isPass = m.IsPassed;
                     const statusClass = isPass ? 'mark-pass' : 'mark-fail';
                     const statusText = isPass ? 'PASS' : 'FAIL';
@@ -197,7 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         </li>
                     `;
                 }).join('');
-                marksHtml = `<ul class="mark-list">${list}</ul>`;
+                
+                const formatNum = (num) => parseFloat(num.toFixed(2));
+                
+                const totalHtml = `
+                    <li class="mark-item" style="border-top: 1px solid var(--card-border); margin-top: 8px; padding-top: 16px; background: rgba(255,255,255,0.03); border-radius: 6px; padding-left: 12px; padding-right: 12px;">
+                        <div class="mark-info">
+                            <span class="mark-name" style="color: #c4b5fd; font-weight: 700; font-size: 15px;">TOTAL SCORE</span>
+                        </div>
+                        <div class="mark-score-container">
+                            <span class="mark-value" style="font-size: 18px; color: #fff;">${formatNum(totalScore)} <span style="opacity:0.6;font-size:14px;">/ ${formatNum(totalMax)}</span></span>
+                        </div>
+                    </li>
+                `;
+                
+                marksHtml = `<ul class="mark-list">${list}${totalHtml}</ul>`;
             } else {
                 marksHtml = `<div style="padding:40px 20px; color:var(--text-muted); text-align:center;">No marks available for this course</div>`;
             }
