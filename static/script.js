@@ -177,18 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const error = item.error;
             
             let marksHtml = '';
+            let totalObtained = 0;
             if (error) {
                 marksHtml = `<div class="card-error">${error}</div>`;
             } else if (marks && marks.length > 0) {
-                let totalScore = 0;
-                let totalMax = 0;
-                
+                marks.forEach(m => {
+                    totalObtained += parseFloat(m.OrginalConvertedMark) || 0;
+                });
+                totalObtained = Math.round(totalObtained * 100) / 100;
+
                 const list = marks.map(m => {
-                    const score = parseFloat(m.OrginalConvertedMark) || 0;
-                    const max = parseFloat(m.RubricsMaxMark) || 0;
-                    totalScore += score;
-                    totalMax += max;
-                    
                     const isPass = m.IsPassed;
                     const statusClass = isPass ? 'mark-pass' : 'mark-fail';
                     const statusText = isPass ? 'PASS' : 'FAIL';
@@ -205,21 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </li>
                     `;
                 }).join('');
-                
-                const formatNum = (num) => parseFloat(num.toFixed(2));
-                
-                const totalHtml = `
-                    <li class="mark-item" style="border-top: 1px solid var(--card-border); margin-top: 8px; padding-top: 16px; background: rgba(255,255,255,0.03); border-radius: 6px; padding-left: 12px; padding-right: 12px;">
-                        <div class="mark-info">
-                            <span class="mark-name" style="color: #c4b5fd; font-weight: 700; font-size: 15px;">TOTAL SCORE</span>
-                        </div>
-                        <div class="mark-score-container">
-                            <span class="mark-value" style="font-size: 18px; color: #fff;">${formatNum(totalScore)} <span style="opacity:0.6;font-size:14px;">/ ${formatNum(totalMax)}</span></span>
-                        </div>
-                    </li>
-                `;
-                
-                marksHtml = `<ul class="mark-list">${list}${totalHtml}</ul>`;
+                marksHtml = `<ul class="mark-list">${list}</ul>`;
             } else {
                 marksHtml = `<div style="padding:40px 20px; color:var(--text-muted); text-align:center;">No marks available for this course</div>`;
             }
@@ -230,7 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>${c.CourseName || 'Unknown Course'}</h3>
                     <div class="card-meta">
                         <span class="month-badge">${c.MonthYearValue || '-'}</span>
-                        <span class="grade-badge">Grade: ${c.FinalGrade || 'N/A'}</span>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            ${marks && !error ? `<span class="grade-badge" style="background: rgba(138,43,226,0.15); border-color: rgba(138,43,226,0.3); color: #fff;">Total: ${totalObtained}/500</span>` : ''}
+                            <span class="grade-badge">Grade: ${c.FinalGrade || 'N/A'}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
